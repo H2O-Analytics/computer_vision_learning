@@ -3,7 +3,7 @@ from ultralytics import YOLO
 model = YOLO('yolov8n-cls.pt')  # load a pretrained model (recommended for training). YOLOV8 image class model
 
 # data folder has to have a train and val subfolder of images, or model.train will not work.
-model.train(data='/Users/tawate/Documents/H2O_Analytics/data/cv_engineer_youtube_data/weather_image_class',
+model.train(data='/Users/tawate/Documents/H2O_Analytics/data/cv_engineer_youtube_data/weather_images',
             epochs=20, imgsz=64)
 
 """ 
