@@ -16,6 +16,7 @@ import test as t
 # you must clone the following repo to get this to work: git clone https://github.com/computervisioneng/Silent-Face-Anti-Spoofing.git
 # you must install the follow requirements: pip install -r Silent-Face-Anti-Spoofing/requirements.txt
 
+
 class App:
     def __init__(self):
         self.main_window = tk.Tk()
