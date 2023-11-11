@@ -6,7 +6,7 @@ import numpy as np
 from pneu_class_util import classify, set_background
 
 # to create the streamlit app in browser run the follow:
-# streamlit run /Users/tawate/Documents/H2O_Analytics/computer_vision_learning/CV_Engineer_YouTube_Tutorials/02_Image_Classification/pnemonia_classifier/main.py
+# streamlit run /Users/tawate/Documents/H2O_Analytics/computer_vision_learning/CV_Engineer_YouTube_Tutorials/02_Image_Classification/pneu_class_main.py
 
 set_background('/Users/tawate/Documents/H2O_Analytics/data/cv_engineer_youtube_data/bg5.png')
 
