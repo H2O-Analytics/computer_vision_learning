@@ -8,8 +8,13 @@ from PIL import Image, ImageTk
 import face_recognition
 
 import face_attend_util
-from test import test
+# import the test.py file from the Anti Spoofing library that was cloned to the repo
+import sys
+sys.path.append("Silent-Face-Anti-Spoofing")
+import test as t
 
+# you must clone the following repo to get this to work: git clone https://github.com/computervisioneng/Silent-Face-Anti-Spoofing.git
+# you must install the follow requirements: pip install -r Silent-Face-Anti-Spoofing/requirements.txt
 
 class App:
     def __init__(self):
@@ -39,7 +44,7 @@ class App:
 
     def add_webcam(self, label):
         if 'cap' not in self.__dict__:
-            self.cap = cv2.VideoCapture(2)
+            self.cap = cv2.VideoCapture(1)
 
         self._label = label
         self.process_webcam()
@@ -58,7 +63,7 @@ class App:
 
     def login(self):
 
-        label = test(
+        label = t.test(
                 image=self.most_recent_capture_arr,
                 model_dir='/Users/tawate/Documents/H2O_Analytics/computer_vision_learning/Silent-Face-Anti-Spoofing/resources/anti_spoof_models',
                 device_id=0
@@ -81,7 +86,7 @@ class App:
 
     def logout(self):
 
-        label = test(
+        label = t.test(
                 image=self.most_recent_capture_arr,
                 model_dir='/Users/tawate/Documents/H2O_Analytics/computer_vision_learning/Silent-Face-Anti-Spoofing/resources/anti_spoof_models',
                 device_id=0
@@ -153,3 +158,10 @@ class App:
 if __name__ == "__main__":
     app = App()
     app.start()
+    
+    
+    
+import cv2 
+import matplotlib.pyplot as plt
+key = cv2. waitKey(1)
+webcam = cv2.VideoCapture(-1)
