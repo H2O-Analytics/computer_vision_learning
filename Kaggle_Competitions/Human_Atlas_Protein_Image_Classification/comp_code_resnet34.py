@@ -1,8 +1,8 @@
 # pip install fastai==0.7.0 --no-deps
 # pip install torch==0.4.1 torchvision==0.2.1
 
-from fastai.conv_learner import *
-from fastai.dataset import *
+# from fastai.conv_learner import *
+# from fastai.dataset import *
 
 import pandas as pd
 import numpy as np
@@ -49,6 +49,10 @@ name_label_dict = {
 25:  'Cytosol',
 26:  'Cytoplasmic bodies',   
 27:  'Rods & rings' }
+# write the below tables to a comma separated text file
+test_names = sorted({f[:36] for f in os.listdir(TEST)})
+train_names = sorted({f[:36] for f in os.listdir(TRAIN)})
+train_names = train_names[1:]
 
 # Load Data and Read into Train and Validation Text files
 with open(SPLIT + 'tr_names.txt' , 'r') as text_file:
@@ -57,7 +61,6 @@ with open(SPLIT + 'tr_names.txt' , 'r') as text_file:
 with open(SPLIT + 'val_names.txt', 'r') as text_file:
     val_n = text_file.read().split(',')
 
-test_names = sorted({f[:36] for f in os.listdir(TEST)})
 print(len(tr_n), len(val_n))
 
 # Create duplicates for rare classes in train set (Class)
@@ -65,11 +68,24 @@ class Oversampling:
     def __init__(self,path):
         self.train_labels = pd.read_csv(path).set_index('Id')
         self.train_labels['Target'] = [[int(i) for i in s.split()]
-                                       for s in self.train_labels['Targe']]
+                                       for s in self.train_labels['Target']]
         
         # set the min number of duplicates for each class
         self.multi = [1,1,1,1,1,1,1,1
                       ,4,4,4,1,1,1,1,4
                       ,1,1,1,1,2,1,1,1
                       ,1,1,1,4]
+        
+        
+    
+    def get(self, image_id):
+        labels = self.train_labels.loc(image_id, 'Target') if image_id in self.train_labels.index else []
+        m = 1
+        for l in labels:
+            if m < self.multi[l]: 
+                m = self.multi[l]
+        return m
 
+s = Oversampling(LABELS)
+tr_n = [idx for idx in tr_n for _ in range(s.get(idx))]
+print(len(tr_n),flush=True)
