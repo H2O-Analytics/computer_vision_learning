@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 
 import aws_credentials
 
-
-output_dir = './output_lane_crossing'
+DATA_PATH = '/Users/tawate/Documents/H2O_Analytics/data/cv_engineer_youtube_data'
+output_dir = DATA_PATH + 'output/output_lane_crossing'
 anns_dir = os.path.join(output_dir, 'anns')
 imgs_dir = os.path.join(output_dir, 'imgs')
 

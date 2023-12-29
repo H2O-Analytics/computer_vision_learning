@@ -58,3 +58,5 @@ docs/_build/
 
 # Random Directories
 CV_Engineer_YouTube_Tutorials/02_Image_Classification/Silent-Face-Anti-Spoofing/
+runs/
+output/

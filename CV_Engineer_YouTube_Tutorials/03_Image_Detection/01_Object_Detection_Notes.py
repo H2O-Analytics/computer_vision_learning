@@ -45,6 +45,11 @@ Detectron2 - https://github.com/facebookresearch/detectron2/blob/main/MODEL_ZOO.
 1. Facebook research object detection and segementation library
 2. Contains different models to choose from in the model zoo github url above
 3. 
+"""
 
-
+"""
+AWS Rekognition
+- AWS object detection tool
+- Uses credientials to access the tool. 
+- Only a few lines of code to create the bounding box dimensions for each label in a frame.
 """
