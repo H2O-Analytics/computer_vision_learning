@@ -6,7 +6,8 @@ import cv2
 import credentials
 
 DATA_PATH = '/Users/tawate/Documents/H2O_Analytics/data/cv_engineer_youtube_data'
-output_dir = DATA_PATH + '/output'
+MAIN_DIR = 
+output_dir = '/output'
 output_dir_imgs = os.path.join(output_dir, 'imgs')
 output_dir_anns = os.path.join(output_dir, 'anns')
 
