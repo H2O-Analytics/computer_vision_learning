@@ -61,6 +61,9 @@ with open(SPLIT + 'tr_names.txt' , 'r') as text_file:
 with open(SPLIT + 'val_names.txt', 'r') as text_file:
     val_n = text_file.read().split(',')
 
+val_n = sorted({f[:36] for f in os.listdir(TEST)})
+tr_n = sorted({f[:36] for f in os.listdir(TRAIN)})
+tr_n = train_names[1:]
 print(len(tr_n), len(val_n))
 
 # Create duplicates for rare classes in train set (Class)
