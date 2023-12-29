@@ -55,3 +55,6 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+
+# Random Directories
+02_Image_Classification/Silent-Face-Anti-Spoofing/
