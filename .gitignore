@@ -62,3 +62,4 @@ runs/
 output/
 CV_Engineer_YouTube_Tutorials/03_Image_Detection/credentials.py
 CV_Engineer_YouTube_Tutorials/03_Image_Detection/sort
+CV_Engineer_YouTube_Tutorials/03_Image_Detection/detectron2
