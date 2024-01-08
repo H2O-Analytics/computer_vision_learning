@@ -1,5 +1,4 @@
 import os
-
 from detectron2.engine import DefaultTrainer
 from detectron2.data import MetadataCatalog, DatasetCatalog
 from detectron2.structures import BoxMode

@@ -9,6 +9,7 @@ import config
 import cv2
 from sort.sort import *
 from license_util import *
+import subprocess
 
 # Intialize results dictionary
 results = {}
@@ -83,3 +84,9 @@ while ret:
 # Write results dictionary to csv
 write_csv(results = results
           ,output_path = config.OUTPUT_PATH + '/license_plate_results.csv')
+
+# Run the Add missing python file
+subprocess.run(['python', '/Users/tawate/Documents/H2O_Analytics/computer_vision_learning/CV_Engineer_YouTube_Tutorials/03_Image_Detection/license_add_missing_data.py'])
+
+# Run the Visualization python file
+subprocess.run(['python', '/Users/tawate/Documents/H2O_Analytics/computer_vision_learning/CV_Engineer_YouTube_Tutorials/03_Image_Detection/license_visualize.py'])
