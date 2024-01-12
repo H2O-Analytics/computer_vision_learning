@@ -22,14 +22,14 @@ Loss Function(s)
 3. lower is better
 4. should decrease with epochs
 
-IoU
+IoU (Intersection over Union)
 1. measures detection accuracy
 2. ranges between 0 and 1
 3. High is Better
-4. IoU = Area of Overlap of bounding box/ Area of union bounding box
+4. IoU = Area of Overlap of bounding box / Area of union bounding box
 5. Needs bounding box ground truth to compare to
 
-mAP
+mAP (mean average precision)
 1. based on the precision-recall curve
 2. precision-recall curve is based on the IoU and detection confidence score
 3. recall measures how effectively we can find objects

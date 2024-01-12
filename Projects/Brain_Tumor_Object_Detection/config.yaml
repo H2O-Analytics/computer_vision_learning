@@ -1,7 +1,6 @@
-path: = /Users/tawate/Documents/H2O_Analytics/computer_vision_learning/Projects/Brain_Tumor_Object_Detection # absolute path to data
-train: train/imgs  # train images (relative to 'path')
-val: train/imgs # val images (relative to 'path')
+path: /Users/tawate/Documents/H2O_Analytics/data/cv_engineer_youtube_data/object_detection/brain_tumor # absolute path to data
+train: train/images  # train images (relative to 'path')
+val: valid/images # val images (relative to 'path')
 
 # Classes. Include all classes you want to detect
-names:
-  0: tumor
+names: ['negative', 'positive']
