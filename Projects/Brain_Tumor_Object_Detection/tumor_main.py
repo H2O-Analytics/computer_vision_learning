@@ -114,24 +114,29 @@ bbox_df_fin['rolling_id_count'] = bbox_df_fin.groupby('id').cumcount() + 1
 max_id_count = bbox_df_fin.groupby('id')['rolling_id_count'].max()
 bbox_df_fin = bbox_df_fin.merge(max_id_count.rename('id_count'), left_on='id', right_index=True)
 
-# Draw bounding box(s) on each image and images to data folder
+# Draw bounding box(s) on each image and save images to data folder
 for i in range(len(bbox_df_fin)):
+    img_array = cv2.imread(images_path + bbox_df_fin['id'].iloc[i])
+    top_left = (bbox_df_fin['x1'].iloc[i] , bbox_df['y1'].iloc[i])
+    bottom_right = (bbox_df_fin['x2'].iloc[i] , bbox_df_fin['y2'].iloc[i])
+    top_right = (bbox_df_fin['x2'].iloc[i] , bbox_df_fin['y1'].iloc[i])
+    # Assign bbox color depending on classification
+    if bbox_df_fin['class_id'].iloc[i] == 'positive': bbox_color = (0,0,255)
+    elif bbox_df_fin['class_id'].iloc[i] == 'negative': bbox_color = (0,255,0)
     # One bound box in image
     if bbox_df_fin['id_count'].iloc[i] == 1:
-        img_array = cv2.imread(images_path + bbox_df_fin['id'].iloc[i])
-        left_corner = (bbox_df_fin['x1'].iloc[i] , bbox_df_fin['y1'].iloc[i])
-        right_corner = (bbox_df_fin['x2'].iloc[i] , bbox_df_fin['y2'].iloc[i])
-        bbox_img = cv2.rectangle(img_array, left_corner, right_corner, (255,255,255),2)
+        bbox_img = cv2.rectangle(img_array, top_left, bottom_right, bbox_color,2)
+        bbox_img = cv2.putText(bbox_img,str(bbox_df_fin['class_pred'].iloc[i]),top_right,cv2.FONT_HERSHEY_SIMPLEX,.5,bbox_color,2)
         cv2.imwrite(config.DATA_PATH + 'object_detection/brain_tumor/valid/images_bbox/' + bbox_df_fin['id'].iloc[i] , bbox_img)
     # Multiple bounding boxes in image
     elif bbox_df_fin['id_count'].iloc[i] > 1:
-        img_array = cv2.imread(images_path + bbox_df_fin['id'].iloc[i])
-        top_left = (bbox_df_fin['x1'].iloc[i] , bbox_df['y1'].iloc[i])
-        bottom_right = (bbox_df_fin['x2'].iloc[i] , bbox_df_fin['y2'].iloc[i])
+        # Draw bboxes
         if bbox_df_fin['rolling_id_count'].iloc[i] == 1:
-            bbox_img = cv2.rectangle(img_array, top_left, bottom_right, (255,255,255),2)
+            bbox_img = cv2.rectangle(img_array, top_left, bottom_right, bbox_color,2)
+            bbox_img = cv2.putText(bbox_img,str(bbox_df_fin['class_pred'].iloc[i]),top_right,cv2.FONT_HERSHEY_SIMPLEX,.5,bbox_color,2)
         elif bbox_df_fin['rolling_id_count'].iloc[i] > 1:
-            bbox_img = cv2.rectangle(bbox_img, top_left, bottom_right, (255,255,255),2)
+            bbox_img = cv2.rectangle(bbox_img, top_left, bottom_right, bbox_color,2)
+            bbox_img = cv2.putText(bbox_img,str(bbox_df_fin['class_pred'].iloc[i]),top_right,cv2.FONT_HERSHEY_SIMPLEX,.5,bbox_color,2)
         if bbox_df_fin['rolling_id_count'].iloc[i] == bbox_df_fin['id_count'].iloc[i]:
             cv2.imwrite(config.DATA_PATH + 'object_detection/brain_tumor/valid/images_bbox/' + bbox_df_fin['id'].iloc[i] , bbox_img)
         
