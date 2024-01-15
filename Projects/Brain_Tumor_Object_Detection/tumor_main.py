@@ -44,28 +44,94 @@ for filename in filenames:
         detection.append(filename)
         bbox_directory.append(detection)
 
-
+# Convert bounding box list to dataframe
 bbox_df = pd.DataFrame(bbox_directory, columns = ['x1', 'y1', 'x2', 'y2', 'class_pred', 'class_id', 'id']).sort_values('id')
-# Calculate rolling count by id
+
+# Calculate rolling count and max count by id
 bbox_df['rolling_id_count'] = bbox_df.groupby('id').cumcount() + 1
 max_id_count = bbox_df.groupby('id')['rolling_id_count'].max()
-# Get max number of bounding boxes per id
+
+# Combine max id count with bbox dataframe.
 bbox_df = bbox_df.merge(max_id_count.rename('id_count'), left_on='id', right_index=True)
-for i in range(len(bbox_df)):
-    if bbox_df['id_count'].iloc[i] == 1:
-        img_array = cv2.imread(images_path + bbox_df['id'].iloc[i])
-        left_corner = (bbox_df['x1'].iloc[i] , bbox_df['y1'].iloc[i])
-        right_corner = (bbox_df['x2'].iloc[i] , bbox_df['y2'].iloc[i])
+
+# Calculate the IoU of two bounding boxes
+def bbox_iou(boxA, boxB):
+    # https://www.pyimagesearch.com/2016/11/07/intersection-over-union-iou-for-object-detection/
+    # ^^ corrected.
+    # Determine the (x, y)-coordinates of the intersection rectangle
+    xA = max(boxA[0], boxB[0])
+    yA = max(boxA[1], boxB[1])
+    xB = min(boxA[2], boxB[2])
+    yB = min(boxA[3], boxB[3])
+    interW = xB - xA + 1
+    interH = yB - yA + 1
+    # Correction: reject non-overlapping boxes
+    if interW <=0 or interH <=0 :
+        return -1.0
+
+    interArea = interW * interH
+    boxAArea = (boxA[2] - boxA[0] + 1) * (boxA[3] - boxA[1] + 1)
+    boxBArea = (boxB[2] - boxB[0] + 1) * (boxB[3] - boxB[1] + 1)
+    iou = interArea / float(boxAArea + boxBArea - interArea)
+    return iou
+
+# Subset to images with multiple bounding boxes
+multi_bbox_df = bbox_df[bbox_df['id_count'] > 1]
+multi_bbox_df['unique_idx'] = -1
+for i in range(len(multi_bbox_df)):
+    multi_bbox_df['unique_idx'].iloc[i] = i
+
+# Find bounding boxes that overlap more than 75%. 
+# Take the bounding box associated with the larged class prediction per image if meets overlap condition
+index_to_drop = []
+IOU_THRESHOLD = .75
+for i in range(len(multi_bbox_df)):
+    if multi_bbox_df['rolling_id_count'].iloc[i] == 1:
+        print('first bbox on image')
+    elif multi_bbox_df['rolling_id_count'].iloc[i] == 2:
+        bbox1 = multi_bbox_df.iloc[i-1][0:4].tolist() # x1, y1, x2, y2 (hard coded to index numbers - bad)
+        bbox2 = multi_bbox_df.iloc[i][0:4].tolist() # x1, y1, x2, y2 (hard coded to index numbers - bad)
+        iou = bbox_iou( boxA=bbox1
+                        ,boxB=bbox2)
+        if iou > IOU_THRESHOLD:
+            if multi_bbox_df.iloc[i]['class_pred'] >= multi_bbox_df.iloc[i-1]['class_pred']:
+                index_to_drop.append(multi_bbox_df['unique_idx'].iloc[i-1])
+            else:
+                index_to_drop.append(multi_bbox_df['unique_idx'].iloc[i])
+
+# Remove bounding boxe data
+multi_bbox_df2 = multi_bbox_df[~multi_bbox_df['unique_idx'].isin(index_to_drop)]
+
+# Merge single bbox images with multi bbox image data 
+single_bbox_df = bbox_df[bbox_df['id_count'] == 1]
+single_bbox_df2 = single_bbox_df.drop(['rolling_id_count','id_count'], axis=1)
+multi_bbox_df3 = multi_bbox_df2.drop(['rolling_id_count','id_count','unique_idx'], axis=1)
+bbox_df_fin = pd.concat([multi_bbox_df3, single_bbox_df2], ignore_index=True, sort=False)
+bbox_df_fin = bbox_df_fin.sort_values('id')
+
+# Calculate rolling count and max count by id (again)
+bbox_df_fin['rolling_id_count'] = bbox_df_fin.groupby('id').cumcount() + 1
+max_id_count = bbox_df_fin.groupby('id')['rolling_id_count'].max()
+bbox_df_fin = bbox_df_fin.merge(max_id_count.rename('id_count'), left_on='id', right_index=True)
+
+# Draw bounding box(s) on each image and images to data folder
+for i in range(len(bbox_df_fin)):
+    # One bound box in image
+    if bbox_df_fin['id_count'].iloc[i] == 1:
+        img_array = cv2.imread(images_path + bbox_df_fin['id'].iloc[i])
+        left_corner = (bbox_df_fin['x1'].iloc[i] , bbox_df_fin['y1'].iloc[i])
+        right_corner = (bbox_df_fin['x2'].iloc[i] , bbox_df_fin['y2'].iloc[i])
         bbox_img = cv2.rectangle(img_array, left_corner, right_corner, (255,255,255),2)
-        cv2.imwrite(config.DATA_PATH + 'object_detection/brain_tumor/valid/images_bbox/' + bbox_df['id'].iloc[i] , bbox_img)
-    elif bbox_df['id_count'].iloc[i] > 1:
-        img_array = cv2.imread(images_path + bbox_df['id'].iloc[i])
-        left_corner = (bbox_df['x1'].iloc[i] , bbox_df['y1'].iloc[i])
-        right_corner = (bbox_df['x2'].iloc[i] , bbox_df['y2'].iloc[i])
-        if bbox_df['rolling_id_count'].iloc[i] == 1:
-            bbox_img = cv2.rectangle(img_array, left_corner, right_corner, (255,255,255),2)
-        elif bbox_df['rolling_id_count'].iloc[i] > 1:
-            bbox_img = cv2.rectangle(bbox_img, left_corner, right_corner, (255,255,255),2)
-        if bbox_df['rolling_id_count'].iloc[i] == bbox_df['id_count'].iloc[i]:
-            cv2.imwrite(config.DATA_PATH + 'object_detection/brain_tumor/valid/images_bbox/' + bbox_df['id'].iloc[i] , bbox_img)
+        cv2.imwrite(config.DATA_PATH + 'object_detection/brain_tumor/valid/images_bbox/' + bbox_df_fin['id'].iloc[i] , bbox_img)
+    # Multiple bounding boxes in image
+    elif bbox_df_fin['id_count'].iloc[i] > 1:
+        img_array = cv2.imread(images_path + bbox_df_fin['id'].iloc[i])
+        top_left = (bbox_df_fin['x1'].iloc[i] , bbox_df['y1'].iloc[i])
+        bottom_right = (bbox_df_fin['x2'].iloc[i] , bbox_df_fin['y2'].iloc[i])
+        if bbox_df_fin['rolling_id_count'].iloc[i] == 1:
+            bbox_img = cv2.rectangle(img_array, top_left, bottom_right, (255,255,255),2)
+        elif bbox_df_fin['rolling_id_count'].iloc[i] > 1:
+            bbox_img = cv2.rectangle(bbox_img, top_left, bottom_right, (255,255,255),2)
+        if bbox_df_fin['rolling_id_count'].iloc[i] == bbox_df_fin['id_count'].iloc[i]:
+            cv2.imwrite(config.DATA_PATH + 'object_detection/brain_tumor/valid/images_bbox/' + bbox_df_fin['id'].iloc[i] , bbox_img)
         
