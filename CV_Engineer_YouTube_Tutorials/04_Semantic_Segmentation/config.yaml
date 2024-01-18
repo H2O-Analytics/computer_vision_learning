@@ -1,0 +1,6 @@
+path: /Users/tawate/Documents/H2O_Analytics/data/cv_engineer_youtube_data/semantic_segmentation/duck_segmentation
+train: images/train 
+val: images/validation
+
+nc: 1
+names: ['duck']
