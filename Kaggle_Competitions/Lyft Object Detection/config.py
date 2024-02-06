@@ -1,0 +1,1 @@
+DATA_PATH = '/Users/tawate/Documents/H2O_Analytics/data/Kaggle/Lyft_Autonomous_Driving_Object_Detection'
