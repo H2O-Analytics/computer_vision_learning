@@ -9,7 +9,7 @@ import os
 
 from web_app_util import classify, set_background
 
-set_background('/Users/tawate/Documents/H2O_Analytics/data/Kaggle/dogs_v_cats/bg5.png')
+set_background('/Users/tawate/Documents/H2O_Analytics/data/Kaggle/dogs_v_cats/cat_dog.jpeg')
 
 # set title
 st.title('Dog or Cat Classification')
